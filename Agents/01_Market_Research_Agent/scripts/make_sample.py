@@ -12,7 +12,14 @@ make_sample.py — 生成一份带"脏数据"的样本类目导出表
 import argparse
 import csv
 import random
+import sys
 from pathlib import Path
+
+# [本地补丁 · 非上游代码] Windows 控制台默认 GBK(CP936) 时，本脚本输出的 emoji/中文
+# 会抛 UnicodeEncodeError 而中断。强制标准输出走 UTF-8。
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 random.seed(20261013)
 

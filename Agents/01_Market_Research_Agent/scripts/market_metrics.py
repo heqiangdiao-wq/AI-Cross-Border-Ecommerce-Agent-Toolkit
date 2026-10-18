@@ -24,6 +24,12 @@ import statistics
 import sys
 from typing import Any
 
+# [本地补丁 · 非上游代码] Windows 控制台默认 GBK(CP936) 时，本脚本输出的 emoji/中文
+# 会抛 UnicodeEncodeError 而中断。强制标准输出走 UTF-8。
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 # ---------------------------------------------------------------------------
 # 工具
 # ---------------------------------------------------------------------------
