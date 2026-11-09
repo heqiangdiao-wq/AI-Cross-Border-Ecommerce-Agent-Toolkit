@@ -270,6 +270,26 @@ def cmd_matrix(args, plats) -> int:
     return 0
 
 
+def _fmt_tiers(tiers: list, key: str, suffix: str = "") -> str:
+    """把价格分档格式化为「≤79.99:20%/>79.99:14%」形式。
+
+    max=None 表示「无上限」，其下界取前一档的 max；若首档即无上限（例如
+    amazon_br 的固定费恒为 0，只有 [{"max": null, "fee": 0}]），则标注为
+    "all"，避免对空列表取 [-1] 抛 IndexError。
+    """
+    parts = []
+    prev = None
+    for t in tiers or []:
+        mx = t.get("max")
+        if mx is not None:
+            label = f"≤{mx}"
+            prev = mx
+        else:
+            label = f">{prev}" if prev is not None else "all"
+        parts.append(f"{label}:{t[key]}{suffix}")
+    return "/".join(parts)
+
+
 def cmd_list_platforms(plats) -> int:
     print(f"{'key':<28}{'平台':<22}{'佣金%':<12}{'固定费':<26}{'附加%':<7}")
     print("-" * 80)
@@ -277,19 +297,8 @@ def cmd_list_platforms(plats) -> int:
         if k.startswith("_"):
             continue
         ct = v.get("commission_tiers")
-        if ct:
-            comm = "/".join(f"≤{t['max']}:{t['pct']}%" if t.get("max") is not None
-                            else f">{[x['max'] for x in ct if x.get('max')][-1]}:{t['pct']}%"
-                            for t in ct)
-        else:
-            comm = f"{v.get('commission_pct', '-')}%"
-        ft = v.get("fixed_fee_tiers")
-        if ft:
-            fee = "/".join(f"≤{t['max']}:{t['fee']}" if t.get("max") is not None
-                           else f">{[x['max'] for x in ft if x.get('max')][-1]}:{t['fee']}"
-                           for t in ft)
-        else:
-            fee = "0"
+        comm = _fmt_tiers(ct, "pct", "%") if ct else f"{v.get('commission_pct', '-')}%"
+        fee = _fmt_tiers(v.get("fixed_fee_tiers"), "fee") or "0"
         print(f"{k:<28}{v.get('label', k):<22}{comm:<12}{fee:<26}{v.get('extra_pct', 0):<7g}")
     print("\n费率为编写时（见 _meta.updated）公开口径，发布前必须到各平台卖家中心复核；")
     print("显式参数（--commission 等）永远优先于预设。")
