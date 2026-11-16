@@ -124,4 +124,19 @@ prompt: 03 标题生成 Prompt 增加"主关键词位置校验"
 
 ---
 
+## 七、自动检查与版本发布
+
+发往 `main` 的 PR 和推送到 `main` 的提交会运行 [GitHub Actions](./.github/workflows/ci.yml)。检查在 Linux 和 Windows 上使用 Python 3.11，编译检查 Agent 脚本，并用仓库里的样本验证七个模块的命令行输出。测试以 UTF-8 模式运行脚本，依赖 Pillow 读取图片样例。
+
+在仓库根目录可运行同一组样例测试。
+
+```bash
+python -m pip install Pillow==12.2.0
+python .github/scripts/test_smoke.py
+```
+
+维护者如需发布，先将要发布的提交合入上游 `main`，再为该提交创建 `vX.Y.Z` 格式的标签（如 `v0.4.1`）并推送到上游。标签触发同一组检查。两种环境通过后，工作流为该标签创建 GitHub Release，附自动生成的发布说明。GitHub 提供对应版本的 ZIP 和 tar.gz 源码包。若 Release 已存在，重跑时会保留它。
+
+---
+
 **相关文档**：[架构拆解](./docs/00_Architecture_SOP_to_Agent.md) · [Prompt 规范](./docs/01_Prompt_Design_Guide.md) · [合规红线](./docs/03_Compliance_Guard.md) · [路线图](./ROADMAP.md)

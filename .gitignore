@@ -35,6 +35,7 @@ uploads/
 output/
 dist/
 *.log
+__pycache__/
 
 # 但 samples/ 下的产出是"预期结果"，同样需要入库
 !Agents/**/samples/*.json
