@@ -1,0 +1,66 @@
+name: CI and Release
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.11'
+      - name: Install test dependency
+        run: python -m pip install Pillow==12.2.0
+      - name: Check Python syntax
+        run: python -m compileall -q Agents
+      - name: Run fixture-based CLI tests
+        run: python .github/scripts/test_smoke.py
+
+  release:
+    name: Publish GitHub Release
+    if: >-
+      github.repository == 'heqiangdiao-wq/AI-Cross-Border-Ecommerce-Agent-Toolkit' &&
+      github.event_name == 'push' && github.ref_type == 'tag' && !github.event.deleted
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    concurrency:
+      group: release-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify tag is on main
+        run: git merge-base --is-ancestor HEAD origin/main
+      - name: Publish release for the tag
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null; then
+            echo "Release already exists for $RELEASE_TAG"
+            exit 0
+          fi
+          gh release create --repo "$GITHUB_REPOSITORY" \
+            --verify-tag --generate-notes -- "$RELEASE_TAG"
