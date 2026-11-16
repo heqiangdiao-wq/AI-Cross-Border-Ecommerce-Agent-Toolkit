@@ -84,6 +84,8 @@ Step 3  把「系统 Prompt」+「任务 Prompt」+「填好的模板」丢给�
 Step 4  用 docs/04_Result_Checklist.md 逐条自检，通过即发布
 ```
 
+完整执行顺序、交接字段和中断条件见[串联工作流](./workflow.md)，交付文件按[上架素材包模板](./Templates/listing_asset_pack.md)归档。
+
 **第一次跑，建议按这个顺序**（以 Patinete Elétrico 为例，见 [`Examples/`](./Examples/)）：
 
 ```mermaid
