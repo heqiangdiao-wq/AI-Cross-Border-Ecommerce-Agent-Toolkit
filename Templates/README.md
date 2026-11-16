@@ -5,6 +5,7 @@
 | 文件 | 用途 | 主要使用者 |
 |---|---|---|
 | [`product_brief_template.md`](./product_brief_template.md) | **标准中间产物**——三个模块之间的通信契约 | 03 / 04 / 05 |
+| [`listing_asset_pack.md`](./listing_asset_pack.md) | 上架成品的目录结构、交付清单和审核记录 | 03 / 04 / 05 / 运营 |
 | [`keyword_analysis_template.md`](./keyword_analysis_template.md) | 关键词三榜分析表（SOP 1.8） | 03（上游可来自 01） |
 | [`cost_pricing_template.md`](./cost_pricing_template.md) | 定价核算模型（SOP 1.9 / 3.2） | 02（Phase 2） |
 | [`output_qa_checklist.md`](./output_qa_checklist.md) | 交付自检清单（可打印版） | 全部 |
