@@ -278,15 +278,19 @@ def cmd_list_platforms(plats) -> int:
             continue
         ct = v.get("commission_tiers")
         if ct:
+            open_hi = [x["max"] for x in ct if x.get("max")]
+            open_hi = f">{open_hi[-1]}" if open_hi else "任意价"
             comm = "/".join(f"≤{t['max']}:{t['pct']}%" if t.get("max") is not None
-                            else f">{[x['max'] for x in ct if x.get('max')][-1]}:{t['pct']}%"
+                            else f"{open_hi}:{t['pct']}%"
                             for t in ct)
         else:
             comm = f"{v.get('commission_pct', '-')}%"
         ft = v.get("fixed_fee_tiers")
         if ft:
+            open_hi = [x["max"] for x in ft if x.get("max")]
+            open_hi = f">{open_hi[-1]}" if open_hi else "任意价"
             fee = "/".join(f"≤{t['max']}:{t['fee']}" if t.get("max") is not None
-                           else f">{[x['max'] for x in ft if x.get('max')][-1]}:{t['fee']}"
+                           else f"{open_hi}:{t['fee']}"
                            for t in ft)
         else:
             fee = "0"
